@@ -5,7 +5,7 @@ let city = {
 };
 const width = window.innerWidth,
   height = window.innerHeight;
-const globeScale = width / 3.5;
+const globeScale = Math.min(width, height) / 3.5;
 
 // Animation stuff & flags
 let previousLatitude = 0;
