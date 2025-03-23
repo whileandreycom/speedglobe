@@ -12,10 +12,29 @@ canvas {
     z-index: 2; /* Higher z-index → SVG on top */
   }
 
-  input, ul {
+  input {
     position: absolute;
     top: 0;
     left: 0;
     z-index: 3; /* Lower z-index */
   }
   
+  #suggestions {
+    position: relative;
+    width: 100%;
+    z-index: 3;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none; /* Initially hidden */
+  }
+  
+  #suggestions .list-group-item {
+    cursor: pointer;
+  }
+  
+  #suggestions .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
