@@ -5,7 +5,7 @@ let city = {
 };
 const width = window.innerWidth,
   height = window.innerHeight;
-const globeScale = Math.min(width, height) / 3.5;
+const globeScale = width / 3.5;
 
 // Animation stuff & flags
 let previousLatitude = 0;
@@ -24,54 +24,64 @@ let dragLatitude = 0;
 
 // City search input
 
-document
-  .getElementById("cityInput")
-  .addEventListener("input", async function () {
-    const query = this.value;
-    if (query.length < 2) return; // Start searching after 2+ characters
+document.getElementById("cityInput").addEventListener("input", async function () {
+  const query = this.value.trim();
+  const suggestions = document.getElementById("suggestions");
 
-    try {
-      const response = await fetch(
-        `https://secure.geonames.org/searchJSON?name_startsWith=${query}&featureClass=P&maxRows=10&username=whileandrey`
-      );
-      const data = await response.json();
+  if (query.length < 2) {
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none"; // Hide if input is empty
+    return;
+  }
 
-      // Check if geonames is an array and has data
-      if (Array.isArray(data.geonames) && data.geonames.length > 0) {
-        const suggestions = document.getElementById("suggestions");
-        suggestions.innerHTML = "";
+  try {
+    const response = await fetch(
+      `http://api.geonames.org/searchJSON?name_startsWith=${query}&featureClass=P&maxRows=10&username=whileandrey`
+    );
+    const data = await response.json();
 
-        data.geonames.forEach((cityData) => {
-          const li = document.createElement("li");
-          li.textContent = `${cityData.name}, ${cityData.countryName}`;
+    if (Array.isArray(data.geonames) && data.geonames.length > 0) {
+      suggestions.innerHTML = "";
+      suggestions.style.display = "block"; // Show list when results exist
 
-          // Click event to update the global city variable
-          li.onclick = () => {
-            previousLatitude = city.coordinates[1];
-            changingCity = true;
-            showCity = true; 
-            
-            city = {
-              name: cityData.name,
-              coordinates: [parseFloat(cityData.lng), parseFloat(cityData.lat)],
-            };
-            console.log('Latitude:', city.coordinates[1]);
-            document.getElementById("cityInput").value = city.name; // Fill input with selection
-            suggestions.innerHTML = ""; // Hide suggestions after selection
-            // console.log("Selected city:", city); // Debugging output
-           console.log(speedAtLatitude(city.coordinates[1]) + " mph");
+      data.geonames.forEach((cityData) => {
+        const li = document.createElement("li");
+        li.textContent = `${cityData.name}, ${cityData.countryName}`;
+        li.classList.add("list-group-item", "list-group-item-action");
+
+        li.onclick = () => {
+          previousLatitude = city.coordinates[1];
+          changingCity = true;
+          showCity = true;
+
+          city = {
+            name: cityData.name,
+            coordinates: [parseFloat(cityData.lng), parseFloat(cityData.lat)],
           };
+          console.log("Latitude:", city.coordinates[1]);
+          document.getElementById("cityInput").value = city.name;
+          suggestions.innerHTML = "";
+          suggestions.style.display = "none"; // Hide after selection
+          console.log(speedAtLatitude(city.coordinates[1]) + " mph");
+        };
 
-          suggestions.appendChild(li);
-        });
-      } else {
-        console.log("No cities found or invalid response");
-        console.log(data);
-      }
-    } catch (error) {
-      console.error("Error fetching city data:", error);
+        suggestions.appendChild(li);
+      });
+    } else {
+      suggestions.innerHTML = "";
+      suggestions.style.display = "none"; // Hide if no results
     }
-  });
+  } catch (error) {
+    console.error("Error fetching city data:", error);
+  }
+});
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", (event) => {
+  if (!document.getElementById("cityInput").contains(event.target)) {
+    document.getElementById("suggestions").style.display = "none";
+  }
+});
 
 // GLOBE
 // Set canvas dimensions
