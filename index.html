@@ -13,12 +13,25 @@
       }
     </style>
     <link rel="stylesheet" href="globe.css" />
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
   </head>
   <body>
-    <input type="text" id="cityInput" placeholder="Search city..." />
-    <ul id="suggestions" style="background: white;"></ul>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="w-50">
+          <input
+            type="text"
+            id="cityInput"
+            class="form-control"
+            placeholder="Search city..."
+          />
+          <ul id="suggestions" class="list-group mt-2"></ul>
+        </div>
+      </div>
     <canvas id="mapCanvas"></canvas>
     <script type="module" src="globe.js"></script>
   </body>
