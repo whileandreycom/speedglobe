@@ -111,6 +111,33 @@ d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json").then(
     const land = topojson.feature(data, data.objects.land);
     animate();
 
+    let isDragging = false;
+    let prevX = 0;
+    
+    // Start dragging on mousedown anywhere on the page
+    document.addEventListener("mousedown", (event) => {
+      if (event.target.tagName === "INPUT" || event.target.classList.contains("draggable-svg")) {
+        return; // Ignore drag if clicking input or SVG controls
+      }
+      isDragging = true;
+      prevX = event.clientX;
+    });
+    
+    // Capture movement even when mouse is over other elements
+    document.addEventListener("mousemove", (event) => {
+      if (isDragging) {
+        const dx = event.clientX - prevX;
+        λ += dx * 0.2; // Adjust sensitivity
+        projection.rotate([λ, φ]); // Apply rotation
+        prevX = event.clientX;
+      }
+    });
+    
+    // Stop dragging when mouse is released
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+    
     function animate() {
       // Update rotation (rotate eastward)
 
@@ -408,7 +435,7 @@ const circle = svg.append("circle")
 // Append text inside the circle
 const circleText = svg.append("text")
   .attr("x", end.x)
-  .attr("y", end.y-globeScale/30)
+  .attr("y", end.y-globeScale/40)
   .attr("dy", "0.35em") // Center vertically
   .attr("text-anchor", "middle") // Center horizontally
   .attr("fill", "white")
@@ -418,11 +445,11 @@ const circleText = svg.append("text")
 
   const circleTextMPH = svg.append("text")
   .attr("x", end.x)
-  .attr("y", end.y+globeScale/15)
+  .attr("y", end.y+globeScale/13)
   //.attr("dy", "0.35em") // Center vertically
   .attr("text-anchor", "middle") // Center horizontally
   .attr("fill", "white")
-  .attr("font-size", `${globeScale/20}px`)
+  .attr("font-size", `${globeScale/15}px`)
   .attr("pointer-events", "none")
   .text("mph");
 
@@ -453,9 +480,9 @@ const circleText = svg.append("text")
     line.attr("x1", start.x).attr("y1", start.y)
         .attr("x2", end.x).attr("y2", end.y);
     circle.attr("cx", end.x).attr("cy", end.y);
-    circleText.attr("x", end.x).attr("y", end.y-globeScale/30)
+    circleText.attr("x", end.x).attr("y", end.y-globeScale/40)
               .text(Math.round(speedAtLatitude(dragLatitude)));
-    circleTextMPH.attr("x", end.x).attr("y", end.y+globeScale/15)
+    circleTextMPH.attr("x", end.x).attr("y", end.y+globeScale/13)
               .text('mph'); // Display speed inside the circle
     
   
@@ -485,8 +512,8 @@ const circleText = svg.append("text")
     line.attr("x1", positions.start.x).attr("y1", positions.start.y)
         .attr("x2", positions.end.x).attr("y2", positions.end.y);
     circle.attr("cx", positions.end.x).attr("cy", positions.end.y);
-    circleText.attr("x", positions.end.x).attr("y", positions.end.y-globeScale/30)
+    circleText.attr("x", positions.end.x).attr("y", positions.end.y-globeScale/40)
               .text(Math.round(speedAtLatitude(lat)));
-    circleTextMPH.attr("x", positions.end.x).attr("y", positions.end.y+globeScale/15)
+    circleTextMPH.attr("x", positions.end.x).attr("y", positions.end.y+globeScale/13)
               .text('mph');
   }
