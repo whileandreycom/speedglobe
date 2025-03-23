@@ -32,7 +32,7 @@ document
 
     try {
       const response = await fetch(
-        `http://api.geonames.org/searchJSON?name_startsWith=${query}&featureClass=P&maxRows=10&username=whileandrey`
+        `https://secure.geonames.org/searchJSON?name_startsWith=${query}&featureClass=P&maxRows=10&username=whileandrey`
       );
       const data = await response.json();
 
