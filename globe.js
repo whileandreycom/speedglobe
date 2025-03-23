@@ -124,29 +124,42 @@ d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json").then(
     let isDragging = false;
     let prevX = 0;
     
-    // Start dragging on mousedown anywhere on the page
-    document.addEventListener("mousedown", (event) => {
+    // Start dragging (Mouse + Touch)
+    function startDrag(event) {
       if (event.target.tagName === "INPUT" || event.target.classList.contains("draggable-svg")) {
-        return; // Ignore drag if clicking input or SVG controls
+        return; // Ignore drag if interacting with input or controls
       }
       isDragging = true;
-      prevX = event.clientX;
-    });
+      prevX = event.touches ? event.touches[0].clientX : event.clientX;
+    }
     
-    // Capture movement even when mouse is over other elements
-    document.addEventListener("mousemove", (event) => {
-      if (isDragging) {
-        const dx = event.clientX - prevX;
-        λ += dx * 0.2; // Adjust sensitivity
-        projection.rotate([λ, φ]); // Apply rotation
-        prevX = event.clientX;
-      }
-    });
+    // Dragging Movement (Mouse + Touch)
+    function onDrag(event) {
+      if (!isDragging) return;
+      
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const dx = clientX - prevX;
+      λ += dx * 0.2; // Adjust rotation sensitivity
+      projection.rotate([λ, φ]);
+      prevX = clientX;
     
-    // Stop dragging when mouse is released
-    document.addEventListener("mouseup", () => {
+      event.preventDefault(); // Prevent scrolling while dragging
+    }
+    
+    // Stop dragging (Mouse + Touch)
+    function stopDrag() {
       isDragging = false;
-    });
+    }
+    
+    // Add event listeners
+    document.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", onDrag);
+    document.addEventListener("mouseup", stopDrag);
+    
+    // Touch support
+    document.addEventListener("touchstart", startDrag, { passive: false });
+    document.addEventListener("touchmove", onDrag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
     
     function animate() {
       // Update rotation (rotate eastward)
